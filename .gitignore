@@ -1,0 +1,23 @@
+# R session and project files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.Rprofile
+.DistApp.Rproj
+renv.lock
+renv/
+
+# R opens this whenever a plot is printed to the default device, which the test
+# scripts do when they check that a plot builds.
+Rplots.pdf
+
+# Output of preprocess_data.R, and its local download cache. The leading dots
+# in the old entries ("processed_data", "renv.lock") meant the real directories
+# were never actually ignored.
+processed_data/
+data_shiny_source_coop/
+
+# The app's own caches: rendered previews, decimation VRTs, the base map and the
+# Zenodo record. All of it is rebuilt on demand.
+.cache/

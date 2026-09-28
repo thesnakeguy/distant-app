@@ -1,0 +1,101 @@
+{
+  "_comment": "Offline snapshot of the latest SCAR DistAnt Zenodo record, used only when the Zenodo API is unreachable. Refresh by deleting .cache/zenodo_record.rds and this file once a new version of 10.5281/zenodo.10910075 is published.",
+  "id": 14792295,
+  "doi": "10.5281/zenodo.14792295",
+  "landing": "https://doi.org/10.5281/zenodo.14792295",
+  "published": "2025-02-03",
+  "files": [
+    {
+      "key": "chown_et_al-2012.zip",
+      "size": 7987
+    },
+    {
+      "key": "cuzin-roudy_et_al-2014.zip",
+      "size": 672690
+    },
+    {
+      "key": "el_gabbas_et_al-2021.zip",
+      "size": 157963924
+    },
+    {
+      "key": "fabri-ruiz_et_al-2020.zip",
+      "size": 28884900
+    },
+    {
+      "key": "freer_et_al-2019.zip",
+      "size": 265865406
+    },
+    {
+      "key": "green_et_al-2021.zip",
+      "size": 3833844
+    },
+    {
+      "key": "griffiths_et_al-2017.zip",
+      "size": 46662
+    },
+    {
+      "key": "hindell_et_al-2020.zip",
+      "size": 96805981
+    },
+    {
+      "key": "kruger_et_al-2017.zip",
+      "size": 2735152
+    },
+    {
+      "key": "lee_et_al-2017.zip",
+      "size": 942864
+    },
+    {
+      "key": "leihy_et_al-2020.zip",
+      "size": 49014
+    },
+    {
+      "key": "merkel_et_al-2023.zip",
+      "size": 6652873
+    },
+    {
+      "key": "metadata.csv",
+      "size": 296906
+    },
+    {
+      "key": "pinkerton_hayward-2021.zip",
+      "size": 8167207
+    },
+    {
+      "key": "raymond-2014.zip",
+      "size": 99680
+    },
+    {
+      "key": "reisinger_et_al-2021.zip",
+      "size": 24201460
+    },
+    {
+      "key": "reisinger_et_al-2022.zip",
+      "size": 160291
+    },
+    {
+      "key": "terauds_et_al-2024.zip",
+      "size": 26587521
+    },
+    {
+      "key": "testa_et_al-2021.zip",
+      "size": 18038
+    },
+    {
+      "key": "toth_et_al-2025.zip",
+      "size": 116174293
+    },
+    {
+      "key": "viola_et_al-2023.zip",
+      "size": 79585688
+    },
+    {
+      "key": "woods_et_al-2023.zip",
+      "size": 91520222
+    },
+    {
+      "key": "xavier_et_al-2016.zip",
+      "size": 27174517
+    }
+  ]
+}

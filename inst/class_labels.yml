@@ -1,0 +1,51 @@
+# inst/class_labels.yml -- Class names for thematic DistAnt layers that do not
+# ship them in the raster itself.
+#
+# Resolution order in R/classes.R:
+#   1. this file   (keyed by layer id, optionally "<id>|<band name>")
+#   2. a .aux.xml sidecar carrying a GDAL raster attribute table
+#   3. plain "Class N" numbering
+#
+# Anything absent here is not an error: the viewer falls back to the sidecar,
+# then to numbering, and the Metadata tab always states which source was used.
+# To add a layer, copy its class values from the legend you already trust and
+# list them here as `1: "name"`. Colours are optional and must be hex.
+
+# Fabri-Ruiz et al. (2020) Antarctic and sub-Antarctic bioregions. The tif has
+# no colour table, no attribute table and no labels; the class names come from
+# the publication figure. The RCP45 and RCP85 variants are the same 12 classes.
+Fa2020-bioregions:
+  labels: &fabri_ruiz_bioregion_labels
+    1:  "Antarctic inner shelf"
+    2:  "Antarctic outer shelf"
+    3:  "Antarctic deep slope"
+    4:  "Antarctic deep shelf"
+    5:  "Ice shelf frontal zone"
+    6:  "Transition area"
+    7:  "Subantarctic deep slope"
+    8:  "Subantarctic island and shelf"
+    9:  "Subantarctic deep shelf"
+    10: "Campbell Plateau"
+    11: "Deep Magellanic shelf"
+    12: "Magellanic Plateau"
+  colours: &fabri_ruiz_bioregion_colours
+    1:  "#2A5178"
+    2:  "#599D8E"
+    3:  "#94FA8D"
+    4:  "#14115E"
+    5:  "#FFFD8C"
+    6:  "#BFBFBF"
+    7:  "#760107"
+    8:  "#FAB067"
+    9:  "#DD0721"
+    10: "#A24526"
+    11: "#FB3244"
+    12: "#8869AC"
+
+Fa2020-bioregions-RCP45:
+  labels: *fabri_ruiz_bioregion_labels
+  colours: *fabri_ruiz_bioregion_colours
+
+Fa2020-bioregions-RCP85:
+  labels: *fabri_ruiz_bioregion_labels
+  colours: *fabri_ruiz_bioregion_colours
