@@ -48,7 +48,6 @@ DistApp/
 ├── dev/
 │   ├── smoke_test.R        # Headless checks of the data and render paths
 │   └── test_app.R          # Headless exercise of the Shiny server
-├── preprocess_data.R       # Legacy offline pre-processing (see Notes)
 └── README.md
 ```
 
