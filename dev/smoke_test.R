@@ -6,8 +6,8 @@
 #
 # Everything here is offline-safe: the metadata falls back to data/metadata.csv,
 # the Zenodo archives to inst/zenodo_record.json, and the base map to a plain
-# graticule. The only unavoidable network use is reading the COGs themselves,
-# which is the thing under test.
+# graticule if SOmap will not build. The only unavoidable network use is reading
+# the COGs themselves, which is the thing under test.
 
 Sys.setenv(DISTANT_APP_DIR = normalizePath("."))
 suppressPackageStartupMessages({
@@ -127,9 +127,19 @@ section("base map")
 base <- timed("get_base_map", get_base_map())
 ok("base map is a ggplot", inherits(base, "ggplot"))
 ok("base map carries layers", length(base$layers) > 0L)
+# SOmap, not the graticule fallback. SOgg() is the one API that composes, and it
+# only does so under a ggplot2 it was written for, so a silent fall-through to
+# plain_canvas() is the failure mode worth pinning down here.
+ok("base map is the real SOmap, not the fallback",
+   identical(base_map_source(base), "SOmap"), base_map_source(base))
 ok("base map can be rendered",
    is.list(tryCatch(ggplot2::ggplotGrob(base), error = function(e) e)) &&
    !inherits(tryCatch(ggplot2::ggplotGrob(base), error = function(e) e), "error"))
+# The layer is painted on top of the base's panel, so a missing panel is a
+# silently bare map rather than an error.
+ok("base map yields a panel to draw the layer over",
+   inherits(base_panel_grob(base), "grob"),
+   class(base_panel_grob(base))[1])
 
 # ---------------------------------------------------------------------------
 section("renders")

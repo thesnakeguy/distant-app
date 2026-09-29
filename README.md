@@ -146,7 +146,9 @@ metadata as a single-row CSV, and a BibTeX entry for the collection.
   previews are keyed on layer, band, ETag, rendering configuration and month, so
   a repeated view of the same layer is instant and a republished file is picked
   up automatically. The catalogue, base map and Zenodo record have the same
-  treatment. Deleting `.cache/` is always safe.
+  treatment. Deleting `.cache/` is always safe; `invalidate_base_map()` in
+  `R/basemap.R` drops just the base map, which is worth a minute of rebuilding if
+  the coastline is not what you expect.
 * **Reads are serialised** by a process-wide lock. A render takes a few seconds
   and the canvas is around 300,000 cells, so queueing is a better trade than
   letting every concurrent user build one.

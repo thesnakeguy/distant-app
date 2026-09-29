@@ -315,35 +315,24 @@ thematic_scale <- function(cls) {
   )
 }
 
-#' Draw one plot's layers and scales on top of another's.
+#' Paint the base map underneath a layer.
 #'
-#' ggplot2 has never allowed `+` between two plots that both carry layers, and
-#' version 4 tightened this further, so `base + raster` no longer works. The
-#' base map is a finished plot in its own right, so its layers and scales are
-#' spliced in underneath the raster's instead. Scales the raster introduces win;
-#' the base map's scales for its own aesthetics (the bathymetry ramp) are kept,
-#' because dropping them would render the coastline grey.
-#'
-#' The raster plot keeps the coordinate system, the labels and the theme: it is
-#' the one whose frame is authoritative, and it is the one carrying the legend.
-stack_plots <- function(base, top) {
-  if (is.null(base) || !inherits(base, "ggplot") || !length(base$layers)) return(top)
-
-  scale_aesthetics <- function(s) {
-    a <- s$aesthetics
-    if (is.null(a)) return(character())
-    if (is.list(a)) a <- unlist(a, use.names = FALSE)
-    as.character(a)
-  }
-  taken <- unlist(lapply(top$scales$scales, scale_aesthetics), use.names = FALSE)
-  keep <- Filter(
-    function(s) !any(scale_aesthetics(s) %in% taken),
-    base$scales$scales
+#' The base map is already a finished picture, so it is placed as one: a
+#' full-canvas annotation under the raster, which is what the layer's own
+#' transparent nodata is there to let through. Merging the base's layers into the
+#' layer's plot instead cannot work -- ggplot2 allows one scale per aesthetic,
+#' and the bathymetry and the layer both want `fill`, so one of the two would be
+#' coloured with the other's ramp. Drawing the base first also keeps the layer's
+#' own coordinate system, labels and theme authoritative.
+underlay_base <- function(plot, panel, extent = config$polar_extent) {
+  if (is.null(panel)) return(plot)
+  # Prepended, not appended: a layer added with `+` is drawn last, and would
+  # cover the map it is meant to sit on.
+  plot$layers <- c(
+    list(ggplot2::annotation_custom(panel, -extent, extent, -extent, extent)),
+    plot$layers
   )
-
-  top$layers <- c(base$layers, top$layers)
-  if (length(keep)) top$scales$scales <- c(keep, top$scales$scales)
-  top
+  plot
 }
 
 #' Compose the preview and the cached base map.
@@ -404,7 +393,7 @@ render_layer_plot <- function(layer, band = 1L, base = NULL,
       plot.margin  = ggplot2::margin(0, 0, 2, 0)
     )
 
-  p <- stack_plots(base, p)
+  p <- underlay_base(p, base_panel_grob(base))
 
   list(
     plot     = p,
@@ -440,6 +429,9 @@ cache_key <- function(layer, band) {
     # The ETag changes whenever the publisher replaces the file, which is the
     # one thing that can invalidate a render without changing the URL.
     squash(substr(layer$etag %||% "-", 1L, 12L))[1],
+    # How the base map is put under the layer, so a render composited the old way
+    # is never served as though it had been.
+    squash(base_format),
     paste0(squash(c(config$preview_px, config$polar_px_res, config$polar_extent,
                     config$source_target_cells)), collapse = ""),
     squash(format(Sys.Date(), "%Y-%m"))
