@@ -482,8 +482,21 @@ delivery_note <- function(lay) layer_delivery(lay)$note
 #' The Metadata tab: a two-column table of the layer's record, plus the
 #' citation and where the file itself lives.
 metadata_tab <- function(lay) {
+  # The published table carries the placeholder "See reference" in its citation
+  # column on every row, so a citation is composed here instead: the layer's own
+  # publication, then the repository it was taken from. The concept DOI is cited
+  # rather than the current version's, so a citation copied out of the app keeps
+  # resolving after the next release.
+  ref <- lay$reference
+  ref <- if (is.null(ref) || length(ref) != 1L || is.na(ref)) "" else trimws(ref)
+  citation <- paste0(
+    if (nzchar(ref)) paste0(ref, " ") else "",
+    "Data obtained from the SCAR DistAnt Ecological Model Output Repository, ",
+    config$zenodo_concept_doi, ".")
+
   fields <- intersect(names(config$metadata_fields), names(lay))
   values <- vapply(fields, function(f) {
+    if (f == "citation") return(citation)
     v <- lay[[f]]
     if (is.logical(v)) ifelse(is.na(v), "", ifelse(v, "yes", "no"))
     else if (is.numeric(v)) format(v, trim = TRUE, digits = 7)
@@ -495,15 +508,6 @@ metadata_tab <- function(lay) {
   rows <- lapply(names(values)[shown], function(nm) tags$tr(
     tags$td(class = "field", nm),
     tags$td(class = "value", values[[nm]])))
-
-  # Cite the concept DOI rather than the current version's DOI: a citation
-  # copied out of the app has to keep resolving after the next release.
-  citation <- if (identical(lay$citation, "See reference")) {
-    config$collection_citation
-  } else {
-    paste0(lay$citation, "  Data obtained from the SCAR DistAnt Ecological",
-           " Model Output Repository, ", config$zenodo_concept_doi, ".")
-  }
 
   # A flat definition list of where the file actually lives, skipping any
   # route that is not available for this particular layer.
