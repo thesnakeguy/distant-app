@@ -244,6 +244,37 @@ ok("cached render round-trips",
    })
 
 # ---------------------------------------------------------------------------
+section("app.R as the server is started")
+
+# Every check above runs in a session this script has already prepared, and this
+# file opens with library(shiny) -- so nothing here would notice if app.R itself
+# stopped attaching what it needs. A container starts the app as
+# `R -e "shiny::runApp()"`, where nothing is attached, so app.R has to get the
+# app working from a bare session on its own. --vanilla gives exactly that: an
+# empty search path. Sourcing app.R builds the UI and returns the shinyApp
+# object without starting a server, and the base map comes from .cache/.
+bare <- tempfile(fileext = ".R")
+writeLines(c(sprintf("setwd(%s)", deparse(normalizePath("."))),
+             "source('app.R')",
+             "cat(if (is.function(div) || !is.null(div)) 'attached\\n' else 'bare\\n')"),
+           bare)
+out <- suppressWarnings(system2(
+  file.path(R.home("bin"), "Rscript"), c("--vanilla", shQuote(bare)),
+  stdout = TRUE, stderr = TRUE))
+unlink(bare)
+
+ok("app.R loads in a session with nothing attached",
+   any(out == "attached") && !any(grepl("could not find function", out, fixed = TRUE)),
+   paste(utils::tail(out, 1L), collapse = ""))
+ok("...and attaches every package it says it needs",
+   {
+     pkgs <- c("shiny", "htmltools", "bslib", "DT", "ggplot2", "terra",
+               "scales", "yaml", "jsonlite", "SOmap")
+     declared <- grep("^required <- c\\(", readLines("app.R"), value = TRUE)
+     all(vapply(pkgs, function(p) grepl(p, declared, fixed = TRUE), logical(1)))
+   })
+
+# ---------------------------------------------------------------------------
 cat(sprintf("\n%s\n", if (failures == 0L) "all checks passed" else
   sprintf("%d check(s) FAILED", failures)))
 quit(status = if (failures == 0L) 0L else 1L)

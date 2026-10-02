@@ -128,7 +128,7 @@ write_plot_file <- function(r, file) {
   if (is.null(r) || is.null(r$plot)) {
     stop("No layer has been rendered yet.", call. = FALSE)
   }
-  ggplot2::ggsave(file, r$plot, width = 10, height = 10, dpi = 150, bg = "#ffffff")
+  ggplot2::ggsave(file, r$plot, width = 10, height = 10, dpi = 300, bg = "#ffffff")
   invisible(file)
 }
 

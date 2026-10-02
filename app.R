@@ -30,13 +30,23 @@ DISTANT_APP_DIR <- local({
 Sys.setenv(DISTANT_APP_DIR = DISTANT_APP_DIR)
 setwd(DISTANT_APP_DIR)
 
-required <- c("shiny", "bslib", "DT", "ggplot2", "terra", "scales", "yaml",
-              "jsonlite")
+# The single list of what DistApp needs. Everything the app calls by `::` is
+# listed here even though a qualified call would work from a loaded namespace,
+# because the list is also what a packer such as shiny2docker reads to decide
+# what to put in the image. 
+
+required <- c("shiny", "htmltools", "bslib", "DT", "ggplot2", "terra",
+              "scales", "yaml", "jsonlite", "SOmap")
 missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
 if (length(missing)) {
   stop("DistApp needs these packages: ", paste(missing, collapse = ", "),
        ". Install them with install.packages().", call. = FALSE)
 }
+
+suppressPackageStartupMessages({
+  for (pkg in required) library(pkg, character.only = TRUE)
+})
+
 if (utils::packageVersion("bslib") < "0.3.0") {
   stop("DistApp needs bslib >= 0.3.0 for its sidebar layout.", call. = FALSE)
 }
@@ -491,7 +501,7 @@ metadata_tab <- function(lay) {
   ref <- if (is.null(ref) || length(ref) != 1L || is.na(ref)) "" else trimws(ref)
   citation <- paste0(
     if (nzchar(ref)) paste0(ref, " ") else "",
-    "Data obtained from the SCAR DistAnt Ecological Model Output Repository, ",
+    ". Data obtained from the SCAR DistAnt Ecological Model Output Repository, ",
     config$zenodo_concept_doi, ".")
 
   fields <- intersect(names(config$metadata_fields), names(lay))

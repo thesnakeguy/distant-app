@@ -1,0 +1,5 @@
+suppressPackageStartupMessages(library(shiny))
+cat("shiny exports div? ", "div" %in% getNamespaceExports("shiny"), "\n")
+cat("identical(shiny::div, htmltools::div)? ", identical(shiny::div, htmltools::div), "\n")
+for (f in c("div","span","tags","h6","a","code","p","h5","dl","dt","dd"))
+  cat(sprintf("  %-6s -> %s\n", f, exists(f)))
