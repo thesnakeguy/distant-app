@@ -1,0 +1,32 @@
+services:
+  shiny-app:
+    # 1. Build the Docker Image
+    # Docker Compose will look for the Dockerfile in the current directory (.),
+    # build the image, and name the resulting image `shiny-app` (by default).
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # 2. Map the Ports
+    # Maps the host machine's port 80 to the container's port 3838 (the EXPOSE port in your Dockerfile).
+    ports:
+      - "8090:3838"
+
+    # 3. Restart Policy (Optional but Recommended)
+    # This ensures the container automatically restarts if it fails or the host machine reboots.
+    restart: unless-stopped
+
+    # 4. Container Name (Optional)
+    # Assigns a readable name to the container instead of a random one.
+    container_name: distapp
+
+    # 5. Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+
+    # 6. Fix "illegal instruction" and performance issues
+    environment:
+      - OPENBLAS_CORETYPE=GENERIC
+      - MKL_DEBUG_CPU_TYPE=5
