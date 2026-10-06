@@ -30,7 +30,8 @@ shorten <- function(x, n = 90) {
 citation_example <- function(row) {
   cite <- trimws(as.character(row$citation))
   if (!is.na(cite) && nzchar(cite) && cite != "See reference") {
-    return(cite)
+    # El-Gabbas entries miss the space after "Southern Ocean."
+    return(gsub("Ocean.PANGAEA", "Ocean. PANGAEA", cite, fixed = TRUE))
   }
   ref <- sub("[.[:space:]]+$", "", trimws(as.character(row$reference)))
   paste0(ref,
@@ -38,18 +39,36 @@ citation_example <- function(row) {
          "10.5281/zenodo.10910075 (licence: ", row$licence, ").")
 }
 
+extent_wgs84 <- function(row) {
+  raw <- paste(row$xmin, row$xmax, row$ymin, row$ymax, sep = ", ")
+  crs <- trimws(as.character(row$crs))
+  tryCatch({
+    if (length(crs) != 1 || is.na(crs) || !nzchar(crs)) stop("no crs")
+    box <- sf::st_bbox(
+      c(xmin = as.numeric(row$xmin), xmax = as.numeric(row$xmax),
+        ymin = as.numeric(row$ymin), ymax = as.numeric(row$ymax)),
+      crs = crs
+    )
+    out <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(box), 4326))
+    # Antarctic data never crosses the equator: refuse implausible results
+    if (isTRUE(unname(out["ymax"]) > 0)) stop("north of the equator")
+    paste(round(out["xmin"], 2), round(out["xmax"], 2),
+          round(out["ymin"], 2), round(out["ymax"], 2), sep = ", ")
+  }, error = function(e) paste0(raw, " (", crs, ")"))
+}
+
 metadata_table <- function(row, url = NULL) {
   value <- function(x) {
     x <- trimws(as.character(x))
     if (length(x) != 1 || is.na(x)) NA_character_ else x
   }
-  extent <- paste(row$xmin, row$xmax, row$ymin, row$ymax, sep = ", ")
+  extent <- extent_wgs84(row)
   resolution <- paste(row$x_resolution, row$y_resolution, sep = ", ")
   fields <- data.frame(
     Field = c("File", "Taxon", "Modelling method", "Output type",
               "Future projections", "Input data", "Uncertainty type",
               "Model performance", "Model performance measure",
-              "Extent (xmin, xmax, ymin, ymax)", "Resolution (x, y)",
+              "Extent (xmin, xmax, ymin, ymax in EPSG:4326)", "Resolution (x, y)",
               "Spatial units", "CRS", "Licence", "Data usage notes",
               "Reference"),
     Value = c(value(row$file), value(row$taxon), value(row$modelling_method),
